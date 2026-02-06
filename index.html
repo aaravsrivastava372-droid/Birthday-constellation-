@@ -6,36 +6,37 @@
 <title>Star Map</title>
 
 <style>
-body{
-    margin:0;
-    padding:0;
-    background:black;
-    overflow:hidden;
-    font-family:'Segoe UI',sans-serif;
-}
+    body{
+        margin:0;
+        padding:0;
+        background:black;
+        overflow:hidden;
+        font-family:'Segoe UI',sans-serif;
+        display:flex;
+        justify-content:center;
+        align-items:center;
+        height:100vh;
+        color:white;
+    }
 
-canvas{
-    position:absolute;
-    top:0;
-    left:0;
-}
+    canvas{
+        position:absolute;
+        top:0;
+        left:0;
+    }
 
-.centerText{
-    position:absolute;
-    width:100%;
-    text-align:center;
-    top:50%;
-    transform:translateY(-50%);
-    font-size:18px;
-    color:white;
-    opacity:.6;
-    animation:fade 2s infinite alternate;
-}
+    .centerText{
+        position:absolute;
+        text-align:center;
+        font-size:20px;
+        opacity:.7;
+        animation: fade 3s infinite alternate;
+    }
 
-@keyframes fade{
-    from{opacity:.3}
-    to{opacity:1}
-}
+    @keyframes fade{
+        from{opacity:.3}
+        to{opacity:1}
+    }
 </style>
 </head>
 <body>
@@ -43,7 +44,7 @@ canvas{
 <div class="centerText">✨ look at the stars ✨</div>
 
 <audio autoplay loop>
-<source src="music.mp3" type="audio/mpeg">
+  <source src="music.mp3" type="audio/mpeg">
 </audio>
 
 <canvas id="sky"></canvas>
@@ -58,29 +59,20 @@ canvas.height = window.innerHeight;
 let stars = [];
 let forming = false;
 
-// create background stars
-for(let i=0;i<160;i++){
+// background stars
+for(let i=0;i<180;i++){
     stars.push({
         x:Math.random()*canvas.width,
         y:Math.random()*canvas.height,
-        size:Math.random()*1.8,
+        size:Math.random()*2,
         alpha:1,
         targetX:null,
         targetY:null
     });
 }
 
-const text = "HAPPY BIRTHDAY\nAKSHARA";
-
-// responsive font size
-let fontSize;
-if(window.innerWidth < 500){
-    fontSize = 32; // phone
-}else if(window.innerWidth < 900){
-    fontSize = 50; // tablet
-}else{
-    fontSize = 70; // pc
-}
+// text pattern
+const text = "HAPPY BIRTHDAY\nAKSHARA NAGWANI";
 
 function getTextPixels(){
     const off = document.createElement("canvas");
@@ -91,15 +83,11 @@ function getTextPixels(){
 
     offCtx.fillStyle="white";
     offCtx.textAlign="center";
-    offCtx.textBaseline="middle";
-    offCtx.font="bold "+fontSize+"px Arial";
+    offCtx.font="bold 70px Arial";
 
     let lines = text.split("\n");
-    let lineHeight = fontSize + 10;
-    let startY = canvas.height/2 - (lines.length/2 * lineHeight) + lineHeight/2;
-
     for(let i=0;i<lines.length;i++){
-        offCtx.fillText(lines[i], canvas.width/2, startY + i*lineHeight);
+        offCtx.fillText(lines[i], canvas.width/2, canvas.height/2 + (i*80));
     }
 
     const data = offCtx.getImageData(0,0,off.width,off.height).data;
@@ -135,6 +123,7 @@ function formText(){
         }
     }
 
+    // fade out extra stars
     for(let i=pixels.length;i<stars.length;i++){
         stars[i].fade=true;
     }
@@ -149,8 +138,8 @@ function animate(){
 
     stars.forEach(star=>{
         if(forming && star.targetX!=null){
-            star.x += (star.targetX-star.x)*0.05;
-            star.y += (star.targetY-star.y)*0.05;
+            star.x += (star.targetX-star.x)*0.04;
+            star.y += (star.targetY-star.y)*0.04;
             star.alpha = Math.min(1, star.alpha+0.02);
         }
 
