@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,25 +7,27 @@
 
 <style>
 body{
-  margin:0;
-  overflow:hidden;
-  background:black;
-  font-family: 'Segoe UI', sans-serif;
+    margin:0;
+    background:black;
+    overflow:hidden;
+    font-family:Arial, sans-serif;
 }
 
-canvas{
-  display:block;
+#canvas{
+    position:absolute;
+    top:0;
+    left:0;
 }
 
-.centerText{
-  position:absolute;
-  bottom:30px;
-  width:100%;
-  text-align:center;
-  color:white;
-  font-size:14px;
-  opacity:0.6;
-  letter-spacing:1px;
+.message{
+    position:absolute;
+    bottom:40px;
+    width:100%;
+    text-align:center;
+    color:white;
+    font-size:18px;
+    opacity:0.8;
+    letter-spacing:2px;
 }
 </style>
 </head>
@@ -34,38 +36,42 @@ canvas{
 
 <canvas id="canvas"></canvas>
 
-<div class="centerText">
-  look at the stars for a moment ✨
+<div class="message">
+look at the stars for a moment ✨
 </div>
 
-<!-- 🎵 background music -->
+<!-- music -->
 <audio autoplay loop>
-  <source src="music.mp3" type="audio/mpeg">
+<source src="music.mp3" type="audio/mpeg">
 </audio>
 
 <script>
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+function resizeCanvas(){
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener("resize", resizeCanvas);
 
 let stars = [];
 let textStars = [];
 let forming = false;
 
-// ⭐ random scattered stars
-for(let i=0;i<180;i++){
+// scattered stars
+for(let i=0;i<300;i++){
   stars.push({
-    x: Math.random()*canvas.width,
-    y: Math.random()*canvas.height,
-    size: Math.random()*2
+    x: Math.random()*window.innerWidth,
+    y: Math.random()*window.innerHeight,
+    size: Math.random()*1.8
   });
 }
 
-// ⭐ create text points
+// create text shape
 function createText(){
-  const text = "HAPPY BIRTHDAY AKSHARA NAGWANI";
+  const text = "HAPPY BIRTHDAY AKSHARA";
   const tempCanvas = document.createElement("canvas");
   const tempCtx = tempCanvas.getContext("2d");
 
@@ -73,8 +79,12 @@ function createText(){
   tempCanvas.height = canvas.height;
 
   tempCtx.fillStyle = "white";
-  tempCtx.font = "bold 60px Arial";
+
+  let fontSize = window.innerWidth < 500 ? 32 : 70;
+  tempCtx.font = "bold "+fontSize+"px Arial";
   tempCtx.textAlign = "center";
+  tempCtx.textBaseline = "middle";
+
   tempCtx.fillText(text, canvas.width/2, canvas.height/2);
 
   const data = tempCtx.getImageData(0,0,canvas.width,canvas.height).data;
@@ -88,10 +98,9 @@ function createText(){
     }
   }
 }
-
 createText();
 
-// after 2 seconds → start forming
+// form text after 2 sec
 setTimeout(()=>{ forming = true; },2000);
 
 function draw(){
@@ -104,18 +113,17 @@ function draw(){
     let s = stars[i];
 
     if(forming && textStars[i]){
-      s.x += (textStars[i].x - s.x)*0.03;
-      s.y += (textStars[i].y - s.y)*0.03;
+      s.x += (textStars[i].x - s.x)*0.04;
+      s.y += (textStars[i].y - s.y)*0.04;
     }
 
     ctx.beginPath();
-    ctx.arc(s.x, s.y, s.size+0.5, 0, Math.PI*2);
+    ctx.arc(s.x, s.y, s.size+0.6, 0, Math.PI*2);
     ctx.fill();
   }
 
   requestAnimationFrame(draw);
 }
-
 draw();
 </script>
 
