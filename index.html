@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For You ✨</title>
+
+<style>
+body{
+  margin:0;
+  overflow:hidden;
+  background:black;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+canvas{
+  display:block;
+}
+
+.centerText{
+  position:absolute;
+  bottom:30px;
+  width:100%;
+  text-align:center;
+  color:white;
+  font-size:14px;
+  opacity:0.6;
+  letter-spacing:1px;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div class="centerText">
+  look at the stars for a moment ✨
+</div>
+
+<!-- 🎵 background music -->
+<audio autoplay loop>
+  <source src="music.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let stars = [];
+let textStars = [];
+let forming = false;
+
+// ⭐ random scattered stars
+for(let i=0;i<180;i++){
+  stars.push({
+    x: Math.random()*canvas.width,
+    y: Math.random()*canvas.height,
+    size: Math.random()*2
+  });
+}
+
+// ⭐ create text points
+function createText(){
+  const text = "HAPPY BIRTHDAY AKSHARA NAGWANI";
+  const tempCanvas = document.createElement("canvas");
+  const tempCtx = tempCanvas.getContext("2d");
+
+  tempCanvas.width = canvas.width;
+  tempCanvas.height = canvas.height;
+
+  tempCtx.fillStyle = "white";
+  tempCtx.font = "bold 60px Arial";
+  tempCtx.textAlign = "center";
+  tempCtx.fillText(text, canvas.width/2, canvas.height/2);
+
+  const data = tempCtx.getImageData(0,0,canvas.width,canvas.height).data;
+
+  for(let y=0;y<canvas.height;y+=6){
+    for(let x=0;x<canvas.width;x+=6){
+      const index = (y*canvas.width + x)*4;
+      if(data[index+3] > 150){
+        textStars.push({x:x, y:y});
+      }
+    }
+  }
+}
+
+createText();
+
+// after 2 seconds → start forming
+setTimeout(()=>{ forming = true; },2000);
+
+function draw(){
+  ctx.fillStyle="black";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  ctx.fillStyle="white";
+
+  for(let i=0;i<stars.length;i++){
+    let s = stars[i];
+
+    if(forming && textStars[i]){
+      s.x += (textStars[i].x - s.x)*0.03;
+      s.y += (textStars[i].y - s.y)*0.03;
+    }
+
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.size+0.5, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  requestAnimationFrame(draw);
+}
+
+draw();
+</script>
+
+</body>
+</html>
