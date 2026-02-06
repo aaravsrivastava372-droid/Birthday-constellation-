@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>For You ✨</title>
+<title>✨ For Akshara</title>
 
 <style>
 body{
@@ -11,6 +11,30 @@ body{
     background:black;
     overflow:hidden;
     font-family:Arial, sans-serif;
+}
+
+/* start screen */
+#startScreen{
+    position:fixed;
+    width:100%;
+    height:100%;
+    background:black;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    color:white;
+    z-index:10;
+}
+
+#startBtn{
+    margin-top:20px;
+    padding:14px 28px;
+    font-size:18px;
+    border:none;
+    border-radius:30px;
+    background:white;
+    color:black;
 }
 
 #canvas{
@@ -34,20 +58,27 @@ body{
 
 <body>
 
+<div id="startScreen">
+    <h2>✨ A sky made for you</h2>
+    <button id="startBtn">Tap to begin</button>
+</div>
+
 <canvas id="canvas"></canvas>
 
 <div class="message">
 look at the stars for a moment ✨
 </div>
 
-<!-- music -->
-<audio autoplay loop>
+<audio id="music" loop>
 <source src="music.mp3" type="audio/mpeg">
 </audio>
 
 <script>
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
+const music = document.getElementById("music");
+const startBtn = document.getElementById("startBtn");
+const startScreen = document.getElementById("startScreen");
 
 function resizeCanvas(){
   canvas.width = window.innerWidth;
@@ -56,73 +87,74 @@ function resizeCanvas(){
 resizeCanvas();
 window.addEventListener("resize", resizeCanvas);
 
-let stars = [];
-let textStars = [];
-let forming = false;
+let stars=[];
+let textStars=[];
+let forming=false;
+
+// start on tap
+startBtn.onclick = ()=>{
+    startScreen.style.display="none";
+    music.play();
+    setTimeout(()=>{ forming=true; },2500);
+};
 
 // scattered stars
-for(let i=0;i<300;i++){
-  stars.push({
-    x: Math.random()*window.innerWidth,
-    y: Math.random()*window.innerHeight,
-    size: Math.random()*1.8
-  });
+for(let i=0;i<350;i++){
+ stars.push({
+   x:Math.random()*window.innerWidth,
+   y:Math.random()*window.innerHeight,
+   size:Math.random()*2
+ });
 }
 
-// create text shape
+// create text
 function createText(){
-  const text = "HAPPY BIRTHDAY AKSHARA";
-  const tempCanvas = document.createElement("canvas");
-  const tempCtx = tempCanvas.getContext("2d");
+ const text="HAPPY BIRTHDAY AKSHARA";
+ const temp=document.createElement("canvas");
+ const tctx=temp.getContext("2d");
 
-  tempCanvas.width = canvas.width;
-  tempCanvas.height = canvas.height;
+ temp.width=canvas.width;
+ temp.height=canvas.height;
 
-  tempCtx.fillStyle = "white";
+ tctx.fillStyle="white";
+ let size = window.innerWidth<500 ? 40 : 80;
+ tctx.font="bold "+size+"px Arial";
+ tctx.textAlign="center";
+ tctx.fillText(text,canvas.width/2,canvas.height/2);
 
-  let fontSize = window.innerWidth < 500 ? 32 : 70;
-  tempCtx.font = "bold "+fontSize+"px Arial";
-  tempCtx.textAlign = "center";
-  tempCtx.textBaseline = "middle";
+ const data=tctx.getImageData(0,0,canvas.width,canvas.height).data;
 
-  tempCtx.fillText(text, canvas.width/2, canvas.height/2);
-
-  const data = tempCtx.getImageData(0,0,canvas.width,canvas.height).data;
-
-  for(let y=0;y<canvas.height;y+=6){
-    for(let x=0;x<canvas.width;x+=6){
-      const index = (y*canvas.width + x)*4;
-      if(data[index+3] > 150){
-        textStars.push({x:x, y:y});
-      }
-    }
+ for(let y=0;y<canvas.height;y+=7){
+  for(let x=0;x<canvas.width;x+=7){
+   const index=(y*canvas.width+x)*4;
+   if(data[index+3]>150){
+    textStars.push({x:x,y:y});
+   }
   }
+ }
 }
 createText();
 
-// form text after 2 sec
-setTimeout(()=>{ forming = true; },2000);
-
 function draw(){
-  ctx.fillStyle="black";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
+ ctx.fillStyle="black";
+ ctx.fillRect(0,0,canvas.width,canvas.height);
 
-  ctx.fillStyle="white";
+ ctx.fillStyle="white";
 
-  for(let i=0;i<stars.length;i++){
-    let s = stars[i];
+ for(let i=0;i<stars.length;i++){
+  let s=stars[i];
 
-    if(forming && textStars[i]){
-      s.x += (textStars[i].x - s.x)*0.04;
-      s.y += (textStars[i].y - s.y)*0.04;
-    }
-
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.size+0.6, 0, Math.PI*2);
-    ctx.fill();
+  if(forming && textStars[i]){
+   s.x += (textStars[i].x - s.x)*0.03;
+   s.y += (textStars[i].y - s.y)*0.03;
   }
 
-  requestAnimationFrame(draw);
+  ctx.beginPath();
+  ctx.arc(s.x,s.y,s.size+0.6,0,Math.PI*2);
+  ctx.fill();
+ }
+
+ requestAnimationFrame(draw);
 }
 draw();
 </script>
